@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Space+Mono&family=Playfair+Display&display=swap');
+
+.App {
+  text-align: center;
+}
+
+
+.mt{
+  margin-top:13px;
+}
+
+.card-text{
+  font-family: 'Caveat', cursive;
+  font-size:23px;
+  word-break: break-all;
+}
+
+.card-title{
+  font-family: 'Playfair Display', serif;
+}
+
+.card-body{
+  background-color: #fbfb5e;
+  box-shadow: 7px 7px 7px #a5a5a570;
+}
+
+.notebutton{
+  cursor: pointer;
+  font-size:27px;
+}
+
+.noteheader{
+  background-color:#f3f351;
+  height:30px;
+}
+
+
+.primary{
+  color: darkblue;
+}
+
+.danger{
+  color: red;
+  margin-left:13px
+}
+
+
+/* folding */
+.fold::before {
+  content: "";
+  position: absolute;
+  top: 49px;
+  right: 15px;
+  border-style: solid;
+  border-width: 0 30px 35px 0;
+  border-color: #f3ff8d #e4dc79;
+  box-shadow: -4px 5px 11px 0px #00000075;
+}
+
+
+.notedate{
+  size: 13px;
+  font-family: 'Space Mono', monospace;
+}
