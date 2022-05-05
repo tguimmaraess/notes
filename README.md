@@ -1,4 +1,4 @@
-Simple yet fully functional Post-it like app with CRUD. You may add, edit and delte a note.
+Simple yet fully functional Post-it like app with CRUD. You may add, edit and delete a note.
 
 Live working app: https://lit-dusk-08282.herokuapp.com/
 
