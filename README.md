@@ -1,3 +1,9 @@
+Simple yet fully functional Post-it like app with CRUD. You may add, edit and delte a note.
+
+Live working app: https://lit-dusk-08282.herokuapp.com/
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
