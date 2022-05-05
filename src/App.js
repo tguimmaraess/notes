@@ -6,157 +6,137 @@ import Modal from 'react-bootstrap/Modal';
 import React, { useState, setState, ref } from 'react';
 import ReactDOM from 'react-dom';
 
+//Helpers
+import dateTimeHelper from './helpers/dateTimeHelper';
+import storageHelper from './helpers/storageHelper';
+
 function App() {
 
-  const[show, setShow] = useState(false) //Add note modal state (true or false, if true, shows the modal)
+  const [showAddNewNoteModal, setShowAddNewNoteModal] = useState(false); //Add note modal state (true or false, if true, shows the modal)
 
-  const[editmodalshow, setEditModalShow] = useState(false) //Edit note modal state (true or false, if true, shows the modal)
+  const [showEditModal, setShowEditModal] = useState(false); //Edit note modal state (true or false, if true, shows the modal)
 
-  const[editNoteTitle, setEditNoteTitle] = useState('') //Constant that contains the note title to display in the edit modal
+  const [editNoteTitle, setEditNoteTitle] = useState(''); //Constant that contains the note title to display in the edit modal
 
-  const[editNoteContent, setEditNoteContent] = useState('')  //Constant that contains the note text to display in the edit modal
+  const [editNoteContent, setEditNoteContent] = useState('');  //Constant that contains the note text to display in the edit modal
 
-  const[date, setDate] = useState('') //Variable that contains the date that the note was added (this goes in a hidden input in edit modal)
+  const [date, setDate] = useState(''); //Variable that contains the date that the note was added (this goes in a hidden input in edit modal)
 
-  const[noteId, setNoteId] = useState('') //Contains the note id (array index)
+  const [noteId, setNoteId] = useState(''); //Contains the note id (array index)
 
-  const[deleteAlertShow, setDeleteAlertShow] =  useState('') //Shows an alert asking if the user wants to delete a note
+  const [showDeleteAlert, setShowDeleteAlert] =  useState(false); //Shows an alert asking if the user wants to delete a note
 
-  const[noteQuantity, setNoteQuantity] = useState('') //Number of notes
+  const [noteQuantity, setNoteQuantity] = useState(''); //Number of notes
 
-  var noteTitle = React.createRef() //Note title reference used to get the value from the modal
+  const noteTitle = React.createRef(); //Note title reference used to get the value from the modal
 
-  var noteContent = React.createRef() //Note Text reference used to get the value from the modal
+  const noteContent = React.createRef(); //Note Text reference used to get the value from the modal
 
-  var noteDate = React.createRef() //Note date reference used to get the value from the modal
+  const noteDate = React.createRef(); //Note date reference used to get the value from the modal
 
-  //Opens the Add New Note Modal
-  function newNote(){
-    setShow(true)
+  //Opens the "Add New Note" Modal
+  function newNote() {
+    setShowAddNewNoteModal(true);
   }
 
-
-  function editNote(eve){
-
+  //Opens the Edit Modal, filling inputs with data from local storage
+  function openEditNoteModal(eve) {
     //Opens the edit modal
-    setEditModalShow(true)
+    setShowEditModal(true);
 
-    //Gets note array from local storage containing all notes ordered by index ascending
-    const items =  JSON.parse(localStorage.getItem("note")).sort(function(b, a){return 0})
+    //Gets notes array from local storage containing all notes ordered by index ascending
+    const items = storageHelper.getNotesInReverseOrder();
 
     //Gets the note id from the modal
-    var id = eve.target.id
+    var id = eve.target.id;
 
-    setEditNoteTitle(items[id][0]) //Defines the title of the note to fill the edit modal input
-    setEditNoteContent(items[id][1])  //Defines the text of the note to fill the edit modal textarea
-    setDate(items[id][2])  //Defines the date of the note to fill the hidden input in edit modal
-    setNoteId(id) //Defines the id of the note (position in array)
-
+    //Sets all inputs and values with respective data
+    setEditNoteTitle(items[id][0]); //Defines the title of the note
+    setEditNoteContent(items[id][1]);  //Defines the text of the note
+    setDate(items[id][2]);  //Defines the date of the note to fill the hidden input
+    setNoteId(id); //Defines the id of the note (position in array)
   }
 
 
-  function execEditNote(id){
-
-    //Gets note array from local storage containing all notes
-    const items =  JSON.parse(localStorage.getItem("note"))
-
-    //Defines a new value for certain index with title and content
-    items[id] = [noteTitle.current.value, noteContent.current.value, noteDate.current.value]
-
-    //Defines "note" array in local storage with new values
-    localStorage.setItem("note", JSON.stringify(items))
+  //Edits a note by its id
+  function execEditNote(id) {
+    //Saves the edits, passing the ref value of each input as well as the id of the note that's is being edited
+    storageHelper.editNote(noteTitle.current.value, noteContent.current.value, noteDate.current.value, id);
 
     //Closes edit modal
-    setEditModalShow(false)
+    setShowEditModal(false);
 
     //Renders notes
-    showNotes()
-
+    showNotes();
   }
 
-  //Shows the alert modal
-  function deleteNoteAlert(eve){
-    setDeleteAlertShow(true) //Shows delete alert modal
-    setNoteId(eve.target.id) //Defines the note id
+
+  //Shows the delete note alert modal, defining the id of the note that was chosen
+  function deleteNoteAlert(eve) {
+    setShowDeleteAlert(true);
+    setNoteId(eve.target.id);
   }
+
 
   //Deletes a note
-  function deleteNote(id){
-
+  function deleteNote(id) {
     //Closes delete alert
-    setDeleteAlertShow(false)
+    setShowDeleteAlert(false);
 
-    //Gets the array from local storage containing all notes
-    const items = JSON.parse(localStorage.getItem("note"))
+    //Deletes a note by its id
+    storageHelper.deleteNote(id);
 
-    //Deletes the note from the array based on its id (position/index)
-    items.splice(id, 1)
-
-    //Defines "note" array in local storage with new values
-    localStorage.setItem("note", JSON.stringify(items))
-
-   //Rerenders the notes
-   showNotes()
-   countNotes()
-
+    //Rerenders the notes
+    showNotes();
+    countNotes();
   }
 
+
   //Adds a new note
-  function saveNote(){
-
-    //Date object
-    var today = new Date()
-
-     //Formated date
-    var date = today.getFullYear()+'-'+('0'+today.getMonth()).slice(-2)+'-'+('0'+today.getDate()).slice(-2)
+  function saveNote() {
+    //Formated date
+    var date = dateTimeHelper.formatTodaysDate();
 
     //Formated time
-    var time = ('0'+today.getHours()).slice(-2)+':'+('0'+today.getMinutes()).slice(-2)+':'+('0'+today.getSeconds()).slice(-2)
+    var time = dateTimeHelper.formatTodaysTime();
 
     //Defines an array of notes with title, content and date
     var item = [
         noteTitle.current.value,
         noteContent.current.value,
         'Note added on '+ date +', at '+ time
-      ]
+      ];
 
-    //Gets all items ordered by index ascending
-    var items = JSON.parse(localStorage.getItem("note") || "[]").sort(function(b, a){return 0})
-
-    //Adds a new item to the start of the array
-    items.unshift(item)
-
-    //Adds the array in local storage with the new values
-    localStorage.setItem("note", JSON.stringify(items))
+    //Saves a new note in local storage
+    storageHelper.saveNewNote(item);
 
     //Closes the modal
-    setShow(false)
+    setShowAddNewNoteModal(false);
 
     //Displays all notes
-    showNotes()
-    countNotes()
+    showNotes();
+    countNotes();
   }
 
 
-  function showNotes(){
-
-    //Gets array with all notes from local storage ordered by index descending
-    var items = JSON.parse(localStorage.getItem("note")||"[]").sort(function(a, b){return 0})
+  function showNotes() {
+    //Gets all notes
+    var items = storageHelper.getNotesInReverseOrder();
 
     /* HTML Elements Variables */
-    var noteCardContainer = []
-    var noteCard =  []
-    var noteTitle = []
-    var noteContent = []
-    var noteDate  = []
-    var noteTime  = []
-    var notes = []
-    var noteEditButton = []
-    var noteDeleteButton = []
-    var noteHeader  = []
+    var noteCardContainer = [];
+    var noteCard =  [];
+    var noteTitle = [];
+    var noteContent = [];
+    var noteDate  = [];
+    var noteTime  = [];
+    var notes = [];
+    var noteEditButton = [];
+    var noteDeleteButton = [];
+    var noteHeader  = [];
 
     //Loops through array of notes
-    for(var i = 0; i< items.length; i++){
+    for (var i = 0; i < items.length; i++) {
 
       //Creates the card header element
       noteHeader[i] = React.createElement(
@@ -191,7 +171,7 @@ function App() {
         {
           className: 'notebutton primary',
           id: [i],
-          onClick: function(eve){editNote(eve)}
+          onClick: (eve) => openEditNoteModal(eve)
         },
         String.fromCharCode("9998")
       );
@@ -202,7 +182,7 @@ function App() {
          {
            className: 'notebutton danger',
             id: [i],
-            onClick: function(eve){deleteNoteAlert(eve)}
+            onClick: (eve) => deleteNoteAlert(eve)
           },
           String.fromCharCode("10005")
         );
@@ -221,12 +201,11 @@ function App() {
       //Creates card element container for each note, containing all information
       noteCardContainer[i] = React.createElement(
         'div',
-        {className: 'col-sm-6 note fold'},
+        {className: 'col-sm-4 note fold'},
         noteCard[i]
       );
 
       notes.push(noteCardContainer[i]) //Appends all results and elements to a single array
-
     }
 
     //Renders the notes
@@ -236,13 +215,11 @@ function App() {
       </>,
       document.getElementById('notes')
     );
-
   }
 
-
   //Counts all notes
-  function countNotes(){
-    setNoteQuantity(JSON.parse(localStorage.getItem("note") || '[]').length)
+  function countNotes() {
+    setNoteQuantity(storageHelper.countNotes());
   }
 
 
@@ -250,7 +227,7 @@ function App() {
   Adds a delay before calling functions in order to give time for the component to mount/load,
   consequently avoiding invalid DOM errors
   */
-  setTimeout(function(){
+  setTimeout(() => {
     showNotes()
     countNotes()
   }, 0)
@@ -258,7 +235,6 @@ function App() {
   //JSX
   return (
     <>
-
       {/* Add New Note Button*/}
       <div className="App">
         <Button variant="primary mt-5 btn-xxl" onClick={newNote}>+ Create Note</Button>
@@ -274,7 +250,7 @@ function App() {
       </div>
 
         {/* Add New Note Modal*/}
-        <Modal show={show} onHide={function(){setShow(false)}} animation={false}>
+        <Modal show={showAddNewNoteModal} onHide={() => setShowAddNewNoteModal(false)} animation={false}>
           <Modal.Header closeButton>
             <Modal.Title>Add a new note</Modal.Title>
           </Modal.Header>
@@ -287,17 +263,17 @@ function App() {
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={function(){setShow(false)}}>
+            <Button variant="secondary" onClick={() => setShowAddNewNoteModal(false)}>
               Close
             </Button>
-            <Button variant="primary" onClick={function(){saveNote(false)}}>
+            <Button variant="primary" onClick={() => saveNote(false)}>
               Save Changes
             </Button>
           </Modal.Footer>
         </Modal>
 
         {/* Edit Note Modal*/}
-        <Modal show={editmodalshow} onHide={function(){setEditModalShow(false)}} animation={false}>
+        <Modal show={showEditModal} onHide={() => setShowEditModal(false)} animation={false}>
           <Modal.Header closeButton>
             <Modal.Title>Edit a note</Modal.Title>
           </Modal.Header>
@@ -311,17 +287,17 @@ function App() {
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={function(){setEditModalShow(false)}}>
+            <Button variant="secondary" onClick={() => setShowEditModal(false)}>
               Close
             </Button>
-            <Button variant="primary" onClick={function(){execEditNote(noteId)}}>
+            <Button variant="primary" onClick={() => execEditNote(noteId)}>
               Save Changes
             </Button>
           </Modal.Footer>
         </Modal>
 
         {/* Delete Note Modal*/}
-        <Modal show={deleteAlertShow} onHide={function(){setDeleteAlertShow(false)}} animation={false}>
+        <Modal show={showDeleteAlert} onHide={() => setShowDeleteAlert(false)} animation={false}>
           <Modal.Header closeButton>
             <Modal.Title>Delete note</Modal.Title>
           </Modal.Header>
@@ -329,15 +305,14 @@ function App() {
             <p>Are you sure you want to delete this note?</p>
           </Modal.Body>
           <Modal.Footer>
-          <Button variant="secondary" onClick={function(){setDeleteAlertShow(false)}}>
+          <Button variant="secondary" onClick={() => setShowDeleteAlert(false)}>
             Cancel
           </Button>
-            <Button variant="danger" onClick={function(){deleteNote(noteId)}} >
+            <Button variant="danger" onClick={() => deleteNote(noteId)} >
               Delete
             </Button>
           </Modal.Footer>
         </Modal>
-
       </>
   );
 }
