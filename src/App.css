@@ -5,41 +5,41 @@
 }
 
 
-.mt{
+.mt {
   margin-top: 13px;
 }
 
-.card-text{
+.card-text {
   font-family: 'Caveat', cursive;
   font-size: 23px;
   word-break: break-all;
 }
 
-.card-title{
+.card-title {
   font-family: 'Playfair Display', serif;
 }
 
-.card-body{
-  background-color: #fbfb5e;
+.card-body {
+  background-color: #f9f982;
   box-shadow: 7px 7px 7px #a5a5a570;
 }
 
-.notebutton{
+.notebutton {
   cursor: pointer;
   font-size: 27px;
 }
 
-.noteheader{
+.noteheader {
   background-color:#f3f351;
   height: 30px;
 }
 
 
-.primary{
+.primary {
   color: darkblue;
 }
 
-.danger{
+.danger {
   color: red;
   margin-left: 13px
 }
@@ -49,7 +49,7 @@
 .fold::before {
   content: "";
   position: absolute;
-  top: 49px;
+  top: 48px;
   right: 15px;
   border-style: solid;
   border-width: 0 30px 35px 0;
@@ -58,7 +58,7 @@
 }
 
 
-.notedate{
+.notedate {
   size: 13px;
   font-family: 'Space Mono', monospace;
 }
